@@ -1,0 +1,8 @@
+{
+    "java.compile.nullAnalysis.mode": "automatic",
+    "files.associations": {
+        "*.embeddedhtml": "html",
+        "xstring": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
+}
