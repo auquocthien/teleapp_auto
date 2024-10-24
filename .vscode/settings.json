@@ -4,5 +4,6 @@
         "*.embeddedhtml": "html",
         "xstring": "cpp"
     },
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "disabled",
+    "cmake.sourceDirectory": "D:/hoctap/auto_tele/flutter/flutter_auto_tele/windows"
 }

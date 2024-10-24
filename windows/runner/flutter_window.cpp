@@ -16,18 +16,31 @@ FlutterWindow::FlutterWindow(const flutter::DartProject &project)
 
 FlutterWindow::~FlutterWindow() {}
 
+std::string ConvertToUTF8(const std::wstring &wstr)
+{
+  if (wstr.empty())
+    return std::string();
+
+  int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+  std::string strTo(size_needed, 0);
+  WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+  return strTo;
+}
 static std::vector<std::string> GetOpenWindows()
 {
   std::vector<std::string> windowList;
   EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL
               {
-                char windowTitle[256];
-                GetWindowTextA(hwnd, windowTitle, sizeof(windowTitle));
-                if (IsWindowVisible(hwnd) && strlen(windowTitle) > 0)
+                wchar_t windowTitle[256];
+                GetWindowTextW(hwnd, windowTitle, sizeof(windowTitle) / sizeof(wchar_t));
+                if (IsWindowVisible(hwnd) && wcslen(windowTitle) > 0)
                 {
-                  std::string title(windowTitle);
+                  std::wstring titleW(windowTitle);
+                  std::string title = ConvertToUTF8(titleW); // Chuyển đổi sang UTF-8
+
                   auto *titles = reinterpret_cast<std::vector<std::string> *>(lParam);
-                  titles->push_back(title);
+                  std::string windowInfo = title + " - " + std::to_string(reinterpret_cast<intptr_t>(hwnd));
+                  titles->push_back(windowInfo);
                 }
                 return TRUE; // Tiếp tục duyệt các cửa sổ
               },
