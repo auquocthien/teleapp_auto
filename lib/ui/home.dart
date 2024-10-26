@@ -33,23 +33,34 @@ class _HomeState extends State<Home> {
           margin: const EdgeInsets.all(10),
           child: Stack(children: [
             const Cells(),
-            Positioned(
-              bottom: 10,
-              right: 5,
-              child: FloatingActionButton(
-                heroTag: 'add_app',
-                child: const Icon(
-                  Icons.add,
-                  size: 40,
-                ),
-                onPressed: () {
-                  context.read<TeleAppManager>().addTeleApp();
-                  setState(() {});
-                },
-              ),
-            ),
+            // buildFloatdingButton(10, 0, () {
+            //   context.read<TeleAppManager>().addTeleApp();
+            //   setState(() {});
+            // }, Icons.add),
+            buildFloatdingButton(10, 0, () async {
+              await context.read<TeleAppManager>().getTeleApp();
+            }, Icons.refresh)
           ]),
         ),
+      ),
+    );
+  }
+
+  Widget buildFloatdingButton(
+      double bottom, double right, VoidCallback func, IconData icon) {
+    return Positioned(
+      bottom: bottom,
+      right: 0,
+      child: SizedBox(
+        height: 45,
+        width: 45,
+        child: FloatingActionButton(
+            heroTag: 'refesh_app',
+            onPressed: func,
+            child: Icon(
+              icon,
+              size: 35,
+            )),
       ),
     );
   }

@@ -13,24 +13,38 @@ class Cells extends StatefulWidget {
 }
 
 class _CellsState extends State<Cells> {
+  late Future<void> getTeleApps;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    getTeleApps = context.read<TeleAppManager>().getTeleApp();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    int cellLong = context.watch<TeleAppManager>().teleAppCount;
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      child: GridView.builder(
-        itemCount: cellLong,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 0.705),
-        itemBuilder: (BuildContext context, int index) {
-          List<TeleApp> teleApps = context.read<TeleAppManager>().teleApps;
-          return CellItem(teleApps[index]);
-        },
-        scrollDirection: Axis.vertical,
-      ),
-    );
+    return FutureBuilder(
+        future: getTeleApps,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            List<TeleApp> apps = context.watch<TeleAppManager>().teleApps;
+            return GridView.builder(
+              itemCount: apps.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 0.705),
+              itemBuilder: (BuildContext context, int index) {
+                return CellItem(apps[index]);
+              },
+              scrollDirection: Axis.vertical,
+            );
+          }
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        });
   }
 }

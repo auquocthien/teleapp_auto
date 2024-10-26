@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter_auto_tele/models/tele_app.dart';
 import 'package:flutter_auto_tele/ui/schedule/add_schedule.dart';
 import 'package:flutter_auto_tele/ui/tele_app/tele_app_manager.dart';
@@ -14,31 +13,43 @@ class CellItem extends StatefulWidget {
 }
 
 class _CellItemState extends State<CellItem> {
-  final List<String> items = [
-    'Item1',
-    'Item2',
-    'Item3',
-    'Item4',
-    'Item5',
-    'Item6',
-    'Item7',
-    'Item8',
-  ];
-  String? selectedValue;
   @override
   Widget build(BuildContext context) {
+    List<BoxShadow> boxShadow = widget.app.actived
+        ? [
+            BoxShadow(
+              color: Colors.green.withOpacity(0.2),
+              blurRadius: 10,
+              spreadRadius: 1,
+              offset: Offset(0, 3),
+            ),
+            BoxShadow(
+              color: Colors.green.withOpacity(0.1),
+              blurRadius: 20,
+              spreadRadius: 10,
+              offset: Offset(0, 10),
+            )
+          ]
+        : [
+            BoxShadow(
+              color: Colors.red.withOpacity(0.3),
+              blurRadius: 15,
+              spreadRadius: 5,
+              offset: Offset(0, 5),
+            )
+          ];
     return Stack(children: [
       Container(
-        decoration: BoxDecoration(border: Border.all(width: 0.5)),
+        decoration: BoxDecoration(boxShadow: boxShadow),
         width: 65 * 6,
         child: Scaffold(
           appBar: AppBar(
-            title: selectedValue != null
-                ? Text(selectedValue!)
-                : const Text('App'),
+            title: Text(
+                '${widget.app.hwnd} - ${widget.app.actived ? 'opened' : 'closed'}'),
           ),
           drawer: buildSlideTool(),
           body: Container(
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
             height: MediaQuery.of(context).size.height,
           ),
         ),
@@ -68,9 +79,7 @@ class _CellItemState extends State<CellItem> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          buildSearchWindow(),
           ListTile(
-            enabled: selectedValue != null,
             leading: const Icon(
               Icons.play_arrow,
             ),
@@ -83,7 +92,6 @@ class _CellItemState extends State<CellItem> {
             onTap: () {},
           ),
           ListTile(
-            enabled: selectedValue != null,
             leading: const Icon(
               Icons.pause,
             ),
@@ -96,7 +104,6 @@ class _CellItemState extends State<CellItem> {
             onTap: () {},
           ),
           ListTile(
-            enabled: selectedValue != null,
             leading: const Icon(Icons.schedule),
             title: const Text(
               'Add schedule',
@@ -109,90 +116,17 @@ class _CellItemState extends State<CellItem> {
                   .pushNamed(AddSchedule.routeName, arguments: widget.app.id);
             },
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildSearchWindow() {
-    return DropdownButtonHideUnderline(
-      child: DropdownButton2<String>(
-        isExpanded: true,
-        hint: const Row(
-          children: [
-            SizedBox(
-              width: 5,
-            ),
-            Icon(
-              Icons.list,
-              size: 20,
-            ),
-            SizedBox(
-              width: 12,
-            ),
-            Expanded(
-              child: Text(
-                'Select Window',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-                overflow: TextOverflow.ellipsis,
+          ListTile(
+            leading: const Icon(Icons.import_export),
+            title: const Text(
+              'Import/Export',
+              style: TextStyle(
+                fontSize: 16,
               ),
             ),
-          ],
-        ),
-        items: items
-            .map((String item) => DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(
-                    item,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 0, 0, 0),
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ))
-            .toList(),
-        value: selectedValue,
-        onChanged: (String? value) {
-          setState(() {
-            selectedValue = value;
-          });
-          context
-              .read<TeleAppManager>()
-              .updateTitle(widget.app.id, selectedValue!);
-        },
-        buttonStyleData: const ButtonStyleData(
-          height: 50,
-          width: 160,
-          padding: EdgeInsets.only(left: 14, right: 14),
-        ),
-        iconStyleData: const IconStyleData(
-          icon: Icon(
-            Icons.arrow_forward_ios_outlined,
+            onTap: () {},
           ),
-          iconSize: 14,
-        ),
-        dropdownStyleData: DropdownStyleData(
-          maxHeight: 250,
-          width: 180,
-          decoration: const BoxDecoration(
-            color: Color.fromARGB(255, 243, 243, 243),
-          ),
-          offset: const Offset(10, -10),
-          scrollbarTheme: ScrollbarThemeData(
-            radius: const Radius.circular(40),
-            thickness: MaterialStateProperty.all<double>(6),
-            thumbVisibility: MaterialStateProperty.all<bool>(true),
-          ),
-        ),
-        menuItemStyleData: const MenuItemStyleData(
-          height: 40,
-          padding: EdgeInsets.only(left: 14, right: 14),
-        ),
+        ],
       ),
     );
   }

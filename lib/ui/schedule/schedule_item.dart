@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auto_tele/models/schedule.dart';
-import 'package:flutter_auto_tele/services/app_control.dart';
 
 import 'package:flutter_auto_tele/ui/event/event_manager.dart';
 import 'package:flutter_auto_tele/ui/schedule/schedule_events.dart';
@@ -26,8 +25,6 @@ class _ScheduleItemState extends State<ScheduleItem> {
   final TextEditingController _minuteController = TextEditingController();
   final TextEditingController _secondController = TextEditingController();
   final TextEditingController _titleSchedule = TextEditingController();
-
-  final AppControl _windowControl = AppControl();
 
   void calculateTotalTimeWait() {
     bool isChangeTotalTimeWait = scheduleRepeatCount != 0;
@@ -174,16 +171,7 @@ class _ScheduleItemState extends State<ScheduleItem> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             buildRepeatCount(),
-            buildButtonFooter('Run', () async {
-              try {
-                List<String> openWindows =
-                    await _windowControl.getOpenWindows();
-
-                print('Open Windows: $openWindows');
-              } catch (e) {
-                print('Error: $e');
-              }
-            }, Colors.blue),
+            buildButtonFooter('Run', () {}, Colors.blue),
             buildButtonFooter('Reset', () {
               context.read<EventManager>().resetEvent();
               context
