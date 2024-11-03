@@ -58,7 +58,7 @@ class _CellItemState extends State<CellItem> {
           top: 5,
           right: 55,
           child: FloatingActionButton(
-            heroTag: 'delete_app',
+            heroTag: 'delete_app_${widget.app.hwnd}',
             mini: true,
             backgroundColor: Colors.red,
             onPressed: () {

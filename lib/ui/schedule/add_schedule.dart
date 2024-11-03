@@ -41,7 +41,7 @@ class _AddScheduleState extends State<AddSchedule> {
                 child: buildToolBar(),
               ),
               Expanded(
-                child: Schedules(widget.appId),
+                child: Schedules(widget.appId, app.hwnd!),
               ),
               Container(
                 decoration: BoxDecoration(

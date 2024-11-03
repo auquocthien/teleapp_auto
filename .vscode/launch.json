@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        
+        {
+            "name": "Attach to Flutter Desktop process",
+            "type": "lldb",
+            "request": "attach",
+            "pid": "${command:pickProcess}",
+            "program": "${workspaceFolder}/build/windows/runner/Debug/<tên_file_thực_thi.exe>", // Đường dẫn đến file thực thi C++
+            "stopOnEntry": false,
+            "cwd": "${workspaceFolder}"
+          }
+          
+    ]
+}

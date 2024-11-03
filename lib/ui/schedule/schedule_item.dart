@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auto_tele/models/schedule.dart';
+import 'package:flutter_auto_tele/services/app_control.dart';
 
 import 'package:flutter_auto_tele/ui/event/event_manager.dart';
 import 'package:flutter_auto_tele/ui/schedule/schedule_events.dart';
@@ -11,7 +12,8 @@ import 'package:toastification/toastification.dart';
 
 class ScheduleItem extends StatefulWidget {
   final Schedule schedule;
-  const ScheduleItem(this.schedule, {super.key});
+  final int hwnd;
+  const ScheduleItem(this.schedule, this.hwnd, {super.key});
 
   @override
   State<ScheduleItem> createState() => _ScheduleItemState();
@@ -25,6 +27,8 @@ class _ScheduleItemState extends State<ScheduleItem> {
   final TextEditingController _minuteController = TextEditingController();
   final TextEditingController _secondController = TextEditingController();
   final TextEditingController _titleSchedule = TextEditingController();
+
+  AppControl appControl = AppControl();
 
   void calculateTotalTimeWait() {
     bool isChangeTotalTimeWait = scheduleRepeatCount != 0;
@@ -171,7 +175,11 @@ class _ScheduleItemState extends State<ScheduleItem> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             buildRepeatCount(),
-            buildButtonFooter('Run', () {}, Colors.blue),
+            buildButtonFooter('Run', () async {
+              String result = await appControl.captureScreenshot(widget.hwnd);
+              print(result);
+              // throw Exception('this is test');
+            }, Colors.blue),
             buildButtonFooter('Reset', () {
               context.read<EventManager>().resetEvent();
               context

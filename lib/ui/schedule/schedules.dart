@@ -6,7 +6,8 @@ import 'package:provider/provider.dart';
 
 class Schedules extends StatefulWidget {
   final String appId;
-  const Schedules(this.appId, {super.key});
+  final int hwnd;
+  const Schedules(this.appId, this.hwnd, {super.key});
 
   @override
   State<Schedules> createState() => SchedulesState();
@@ -23,9 +24,7 @@ class SchedulesState extends State<Schedules> {
           scrollDirection: Axis.horizontal,
           itemCount: schedules.length,
           itemBuilder: (BuildContext context, int index) {
-            return ScheduleItem(
-              schedules[index],
-            );
+            return ScheduleItem(schedules[index], widget.hwnd);
           });
     });
   }
