@@ -9,6 +9,7 @@ import 'package:flutter_auto_tele/ui/shared/toast_helper.dart';
 import 'package:provider/provider.dart';
 
 import 'package:toastification/toastification.dart';
+import 'dart:io';
 
 class ScheduleItem extends StatefulWidget {
   final Schedule schedule;
@@ -153,7 +154,8 @@ class _ScheduleItemState extends State<ScheduleItem> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             buildButtonFooter('Save', () {
-              showCustomToast(context, 'save sucsess');
+              final tempDir = Directory.systemTemp;
+              print('Đường dẫn tạm: ${tempDir.path}');
             }, Colors.green),
             buildButtonFooter('Add', () {
               eventManager.addEvent(

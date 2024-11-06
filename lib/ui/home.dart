@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_auto_tele/ui/tele_app/tele_app.dart';
 import 'package:flutter_auto_tele/ui/tele_app/tele_app_manager.dart';
@@ -20,30 +22,37 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Home',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.purple,
-      ),
-      body: SafeArea(
-        child: Container(
-          margin: const EdgeInsets.all(10),
-          child: Stack(children: [
-            const Cells(),
-            // buildFloatdingButton(10, 0, () {
-            //   context.read<TeleAppManager>().addTeleApp();
-            //   setState(() {});
-            // }, Icons.add),
-            buildFloatdingButton(10, 0, () async {
-              await context.read<TeleAppManager>().getTeleApp();
-            }, Icons.refresh)
-          ]),
+    return Stack(children: [
+      Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: Image.asset(
+          "assets/images/home_background.jpg",
+          fit: BoxFit.fitWidth,
         ),
       ),
-    );
+      Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Home',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.purple,
+        ),
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
+          child: Container(
+            margin: const EdgeInsets.all(10),
+            child: Stack(children: [
+              const Cells(),
+              buildFloatdingButton(10, 0, () async {
+                await context.read<TeleAppManager>().getTeleApp();
+              }, Icons.refresh)
+            ]),
+          ),
+        ),
+      ),
+    ]);
   }
 
   Widget buildFloatdingButton(

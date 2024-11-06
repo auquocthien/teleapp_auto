@@ -186,7 +186,7 @@ void SaveBitmapToFile(HBITMAP hBitmap, const std::string &filePath, const std::s
       }
     }
 
-    std::string fullPath = "D:/hoctap/auto_tele/flutter/flutter_auto_tele/assets/images/" + filePath;
+    std::string fullPath = "D:/hoctap/auto_tele/images/" + filePath;
     std::wstring wFullPath = ConvertToWString(fullPath);
     Gdiplus::Status status = bitmap.Save(wFullPath.c_str(), &clsid, NULL);
 

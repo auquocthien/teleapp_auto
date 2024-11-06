@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_auto_tele/config/config.dart';
 import 'package:flutter_auto_tele/models/tele_app.dart';
 import 'package:flutter_auto_tele/ui/event/event_list.dart';
 import 'package:flutter_auto_tele/ui/schedule/schedule_manager.dart';
@@ -17,10 +20,13 @@ class AddSchedule extends StatefulWidget {
 
 class _AddScheduleState extends State<AddSchedule> {
   int scheduleCount = 0;
+  TeleApp? app;
 
   @override
   Widget build(BuildContext context) {
-    TeleApp? app = context.read<TeleAppManager>().getAppById(widget.appId);
+    app = context.read<TeleAppManager>().getAppById(widget.appId);
+    String imagePath = '$temporarySavePath/${app!.hwnd}_home.png';
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -41,11 +47,13 @@ class _AddScheduleState extends State<AddSchedule> {
                 child: buildToolBar(),
               ),
               Expanded(
-                child: Schedules(widget.appId, app.hwnd!),
+                child: Schedules(widget.appId, app!.hwnd!),
               ),
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(width: 0.5),
+                  image: DecorationImage(
+                      image: FileImage(File(imagePath)), fit: BoxFit.cover),
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(10),
                     bottomRight: Radius.circular(10),
