@@ -5,7 +5,6 @@ import 'package:flutter_auto_tele/ui/tele_app/tele_app_manager.dart';
 import 'package:provider/provider.dart';
 
 class Cells extends StatefulWidget {
-  // final int cellLong;
   const Cells({super.key});
 
   @override
@@ -13,38 +12,37 @@ class Cells extends StatefulWidget {
 }
 
 class _CellsState extends State<Cells> {
-  late Future<void> getTeleApps;
-
   @override
   void initState() {
-    // TODO: implement initState
-    getTeleApps = context.read<TeleAppManager>().getTeleApp();
     super.initState();
+    // Gọi hàm getTeleApp() để tải danh sách ứng dụng mở khi widget được khởi tạo
+    context.read<TeleAppManager>().getTeleApp();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: getTeleApps,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            List<TeleApp> apps = context.watch<TeleAppManager>().teleApps;
-            return GridView.builder(
-              itemCount: apps.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 0.705),
-              itemBuilder: (BuildContext context, int index) {
-                return CellItem(apps[index]);
-              },
-              scrollDirection: Axis.vertical,
-            );
-          }
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        });
+    // Lấy danh sách teleApps từ TeleAppManager
+    List<TeleApp> apps = context.watch<TeleAppManager>().teleApps;
+
+    if (apps.isEmpty) {
+      return const Center(
+        child:
+            CircularProgressIndicator(), // Hiển thị loading khi chưa có dữ liệu
+      );
+    }
+
+    return GridView.builder(
+      itemCount: apps.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 0.705,
+      ),
+      itemBuilder: (BuildContext context, int index) {
+        return CellItem(apps[index]); // Tạo widget cho mỗi item
+      },
+      scrollDirection: Axis.vertical,
+    );
   }
 }

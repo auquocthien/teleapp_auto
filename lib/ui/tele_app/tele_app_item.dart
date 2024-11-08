@@ -20,11 +20,14 @@ class _CellItemState extends State<CellItem> {
   AppControl appControl = AppControl();
   ImagesControl imagesControl = ImagesControl();
   String? imagePath;
+  bool isEditing = false;
+  String titleApp = '';
 
   @override
   void initState() {
     super.initState();
     loadImagePath();
+    titleApp = widget.app.hwnd.toString();
   }
 
   Future<void> loadImagePath() async {
@@ -98,8 +101,21 @@ class _CellItemState extends State<CellItem> {
           width: 65 * 6,
           child: Scaffold(
             appBar: AppBar(
-              title: Text(
-                  '${widget.app.hwnd} - ${widget.app.actived ? 'opened' : 'closed'}'),
+              title: !isEditing
+                  ? Row(
+                      children: [
+                        Text(
+                            '$titleApp - ${widget.app.actived ? 'opened' : 'closed'}'),
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
+                                isEditing = !isEditing;
+                              });
+                            },
+                            icon: const Icon(Icons.edit))
+                      ],
+                    )
+                  : buildRenameTextField(),
             ),
             drawer: buildSlideTool(),
             body: Container(
@@ -107,14 +123,25 @@ class _CellItemState extends State<CellItem> {
                 borderRadius: BorderRadius.circular(10),
               ),
               height: MediaQuery.of(context).size.height,
-              child: Center(
-                child: imagePath != null
-                    ? Image.file(
-                        File(imagePath!),
-                        key: UniqueKey(),
-                      )
-                    : const CircularProgressIndicator(),
-              ),
+              child: Stack(children: [
+                Center(
+                  child: Container(
+                    width: 325,
+                    height: 570,
+                    decoration: const BoxDecoration(boxShadow: [
+                      BoxShadow(color: Colors.grey, blurRadius: 4)
+                    ]),
+                  ),
+                ),
+                Center(
+                  child: imagePath != null
+                      ? Image.file(
+                          File(imagePath!),
+                          key: UniqueKey(),
+                        )
+                      : const CircularProgressIndicator(),
+                ),
+              ]),
             ),
           ),
         ),
@@ -170,6 +197,32 @@ class _CellItemState extends State<CellItem> {
         ),
       ),
       onTap: func,
+    );
+  }
+
+  Widget buildRenameTextField() {
+    return SizedBox(
+      width: 250,
+      child: TextField(
+        autofocus: true,
+        onSubmitted: (value) {
+          TeleAppManager teleAppManager = context.read<TeleAppManager>();
+          teleAppManager.updateTitle(widget.app.id, value);
+          setState(() {
+            isEditing = false;
+            titleApp = value;
+          });
+        },
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        decoration: InputDecoration(
+            suffixIcon: IconButton(
+                onPressed: () {
+                  setState(() {
+                    isEditing = !isEditing;
+                  });
+                },
+                icon: const Icon(Icons.exit_to_app))),
+      ),
     );
   }
 }
