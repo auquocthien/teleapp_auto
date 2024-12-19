@@ -8,6 +8,7 @@ class Schedule {
   final List<Event>? events;
   final int repeatCount;
   final Duration? totalTimeWait;
+  final bool isActive;
 
   Schedule(
       {required this.id,
@@ -16,7 +17,8 @@ class Schedule {
       this.totalTimeWait,
       this.events,
       this.startTime,
-      this.interupTime});
+      this.interupTime,
+      required this.isActive});
 
   Schedule copyWith(
       {String? id,
@@ -25,7 +27,9 @@ class Schedule {
       DateTime? startTime,
       DateTime? interupTime,
       int? repeatCount,
-      Duration? totalTimeWait}) {
+      Duration? totalTimeWait,
+      bool? isActive}) {
+    print(scheduleName ?? this.scheduleName);
     return Schedule(
         id: id ?? this.id,
         scheduleName: scheduleName ?? this.scheduleName,
@@ -33,6 +37,12 @@ class Schedule {
         startTime: startTime ?? this.startTime,
         interupTime: interupTime ?? this.interupTime,
         repeatCount: repeatCount ?? this.repeatCount,
-        totalTimeWait: totalTimeWait ?? this.totalTimeWait);
+        totalTimeWait: totalTimeWait ?? this.totalTimeWait,
+        isActive: isActive ?? this.isActive);
+  }
+
+  @override
+  String toString() {
+    return 'Schedule(id: $id, scheduleName: $scheduleName, repeatCount: $repeatCount, events: $events, startTime: $startTime, interupTime: $interupTime, totalTimeWait: $totalTimeWait)';
   }
 }

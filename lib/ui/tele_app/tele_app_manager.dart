@@ -37,11 +37,9 @@ class TeleAppManager extends ChangeNotifier {
   }
 
   void updateTitle(String appId, String newTitle) {
-    print(teleApps);
     int index = teleApps.indexWhere((element) => element.id == appId);
     if (index != -1) {
       teleApps[index] = teleApps[index].copyWith(title: newTitle);
-      print(teleApps[index].title);
       notifyListeners();
     } else {
       print('app not found');

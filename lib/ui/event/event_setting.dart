@@ -107,33 +107,54 @@ class _EventSettingState extends State<EventSetting> {
             ),
           ),
           Expanded(
-            child: GestureDetector(
-              onTap: () {
-                updateEvent();
-                widget.changeShowEventSetting();
-                setState(() {});
-              },
-              child: MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: Container(
-                  width: 225,
-                  margin: const EdgeInsets.only(bottom: 5),
-                  decoration: const BoxDecoration(
-                      color: Colors.blueAccent,
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                  padding: EdgeInsets.zero,
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    Icons.check,
-                    size: 30,
-                    weight: 500,
-                    color: Colors.white,
-                  ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                buildEventSettingButton(
+                  () {
+                    updateEvent();
+                    widget.changeShowEventSetting();
+                    setState(() {});
+                  },
+                  Colors.blueAccent,
+                  Icons.check,
                 ),
-              ),
+                buildEventSettingButton(
+                  () {
+                    print('Event execution started');
+                  },
+                  Colors.greenAccent,
+                  Icons.play_arrow_rounded,
+                ),
+              ],
             ),
           )
         ],
+      ),
+    );
+  }
+
+  buildEventSettingButton(
+      VoidCallback ontapFunc, Color btnColor, IconData btnIcon) {
+    return GestureDetector(
+      onTap: ontapFunc,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Container(
+          width: 100,
+          margin: const EdgeInsets.only(bottom: 5),
+          decoration: BoxDecoration(
+              color: btnColor,
+              borderRadius: const BorderRadius.all(Radius.circular(10))),
+          padding: EdgeInsets.zero,
+          alignment: Alignment.center,
+          child: Icon(
+            btnIcon,
+            size: 30,
+            weight: 500,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }

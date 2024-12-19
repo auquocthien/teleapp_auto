@@ -122,7 +122,7 @@ class _CellItemState extends State<CellItem> {
                     )
                   : buildRenameTextField(),
             ),
-            drawer: buildSlideTool(),
+            drawer: buildDrawer(),
             body: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
@@ -150,11 +150,11 @@ class _CellItemState extends State<CellItem> {
                         )
                       : const CircularProgressIndicator(),
                 ),
+                buildSchedulesList(),
               ]),
             ),
           ),
         ),
-        buildSchedulesList(),
         Positioned(
           top: 5,
           right: 55,
@@ -180,7 +180,7 @@ class _CellItemState extends State<CellItem> {
     );
   }
 
-  Widget buildSlideTool() {
+  Widget buildDrawer() {
     return Drawer(
       width: 200,
       child: ListView(
@@ -246,12 +246,11 @@ class _CellItemState extends State<CellItem> {
         .read<ScheduleManager>()
         .getScheduleByAppId(widget.app.id)
         .length;
-    print(scheduleCount);
     return Positioned(
       bottom: 0,
       child: Container(
           height: 315,
-          width: 65 * 6,
+          width: 64 * 6,
           color: Colors.transparent,
           child: ListView.builder(
             itemCount: scheduleCount,
@@ -275,7 +274,7 @@ class _CellItemState extends State<CellItem> {
             padding: const EdgeInsets.only(bottom: 10),
             duration: const Duration(milliseconds: 300),
             height: 75,
-            width: isHovered ? 65 * 6 : 40, // Mở rộng về bên phải khi hover
+            width: isHovered ? 695 : 35, // Mở rộng về bên phải khi hover
             decoration: BoxDecoration(
               boxShadow: isHovered
                   ? [

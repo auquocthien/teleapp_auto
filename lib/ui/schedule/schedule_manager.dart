@@ -38,28 +38,34 @@ class ScheduleManager extends ChangeNotifier {
     Schedule schedule = Schedule(
         id: '$appId/schdeule-$scheduleIndex',
         scheduleName: '$appId/schdeule_$scheduleIndex',
-        repeatCount: 0);
+        repeatCount: 0,
+        isActive: false);
     _schedule.add(schedule);
     notifyListeners();
   }
 
-  Schedule addReloadSchedule(String appId) {
+  void addReloadSchedule(String appId) {
     String scheduleId = '$appId/schdeule-0';
     List<Event> reloadAction = eventManager.getListEventReload(scheduleId);
     Event open = reloadAction[0];
     Event click = reloadAction[1];
+    Duration timeToNextRun =
+        Duration(seconds: open.timeWait.inSeconds + click.timeWait.inSeconds);
 
-    Schedule schedule = Schedule(
-        id: scheduleId,
-        scheduleName: 'default schedule',
-        repeatCount: 5,
-        events: [open, click]);
-    _schedule.add(schedule);
-    notifyListeners();
-    return schedule;
+    int index = schedules.indexWhere((element) => element.id.contains(appId));
+    if (index == -1) {
+      Schedule schedule = Schedule(
+          id: scheduleId,
+          scheduleName: 'Reload schedule',
+          repeatCount: 5,
+          events: [open, click],
+          totalTimeWait: timeToNextRun,
+          isActive: false);
+
+      _schedule.add(schedule);
+      notifyListeners();
+    }
   }
-
-  
 
   void deleteSchduleByAppId(String appId) {
     _schedule.removeWhere((element) => element.id.contains(appId));
@@ -165,5 +171,17 @@ class ScheduleManager extends ChangeNotifier {
 
   int getScheduleCountOfApp(String appId) {
     return _schedule.where((element) => element.id == appId).length;
+  }
+
+  void updateScheduleName(String scheduleId, String newName) {
+    int index = _schedule.indexWhere((element) => element.id == scheduleId);
+
+    if (index != -1) {
+      _schedule[index] = _schedule[index].copyWith(scheduleName: newName);
+      notifyListeners();
+      // print(schedules[index]);
+    } else {
+      print('error when update schedule name');
+    }
   }
 }

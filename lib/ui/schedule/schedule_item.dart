@@ -23,6 +23,7 @@ class ScheduleItem extends StatefulWidget {
 class _ScheduleItemState extends State<ScheduleItem> {
   late String scheduleName = '';
   int scheduleRepeatCount = 0;
+  bool isEditTitile = false;
 
   final TextEditingController _hourController = TextEditingController();
   final TextEditingController _minuteController = TextEditingController();
@@ -33,6 +34,7 @@ class _ScheduleItemState extends State<ScheduleItem> {
 
   void calculateTotalTimeWait() {
     bool isChangeTotalTimeWait = scheduleRepeatCount != 0;
+
     if (widget.schedule.totalTimeWait != null) {
       setState(() {
         _hourController.text = isChangeTotalTimeWait
@@ -50,7 +52,7 @@ class _ScheduleItemState extends State<ScheduleItem> {
 
   @override
   void initState() {
-    _titleSchedule.text = widget.schedule.id;
+    _titleSchedule.text = widget.schedule.scheduleName;
     super.initState();
   }
 
@@ -85,10 +87,35 @@ class _ScheduleItemState extends State<ScheduleItem> {
         child: Column(
           children: [
             Container(
-                height: 40,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.only(left: 4, right: 4),
-                child: buildTitleSchedule()),
+              height: 40,
+              alignment: Alignment.center,
+              padding: const EdgeInsets.only(left: 4, right: 4),
+              child: !isEditTitile
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10.0),
+                          child: Text(
+                            widget.schedule.scheduleName,
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
+                                isEditTitile = !isEditTitile;
+                              });
+                            },
+                            icon: const Icon(Icons.edit))
+                      ],
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+                      child: buildTitleSchedule(),
+                    ),
+            ),
             Expanded(child: ScheduleEvents(widget.schedule.id)),
             Container(
               height: 45,
@@ -130,17 +157,31 @@ class _ScheduleItemState extends State<ScheduleItem> {
   }
 
   Widget buildTitleSchedule() {
-    return TextFormField(
-      controller: _titleSchedule,
-      style: const TextStyle(
-          color: Colors.black, fontSize: 16, fontWeight: FontWeight.w500),
-      decoration: const InputDecoration(
-          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 15)),
-      onChanged: (text) {
-        setState(() {
-          scheduleName = text;
-        });
-      },
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: TextField(
+        controller: _titleSchedule,
+        autofocus: true,
+        onSubmitted: (value) {
+          setState(() {
+            context
+                .read<ScheduleManager>()
+                .updateScheduleName(widget.schedule.id, value);
+            isEditTitile = !isEditTitile;
+            _titleSchedule.text = value;
+          });
+        },
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        decoration: InputDecoration(
+            suffixIcon: IconButton(
+          onPressed: () {
+            setState(() {
+              isEditTitile = !isEditTitile;
+            });
+          },
+          icon: const Icon(Icons.exit_to_app),
+        )),
+      ),
     );
   }
 
@@ -153,18 +194,18 @@ class _ScheduleItemState extends State<ScheduleItem> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            buildButtonFooter('Save', () {
-              final tempDir = Directory.systemTemp;
-              print('Đường dẫn tạm: ${tempDir.path}');
-            }, Colors.green),
+            buildButtonFooter('Save', () {}, Colors.green),
             buildButtonFooter('Add', () {
-              eventManager.addEvent(
-                widget.schedule.id,
-              );
-              eventManager.currentSchedule = widget.schedule.id;
-              showCustomToast(context, 'add event sucsess',
-                  type: ToastificationType.info);
-              setState(() {});
+              if (widget.schedule.scheduleName != 'Reload schedule') {
+                eventManager.addEvent(
+                  widget.schedule.id,
+                );
+                eventManager.currentSchedule = widget.schedule.id;
+                showCustomToast(context, 'add event sucsess',
+                    type: ToastificationType.info);
+                setState(() {});
+              }
+              print(widget.schedule.totalTimeWait);
             }, const Color.fromARGB(255, 255, 233, 38)),
             buildButtonFooter('Del', () {
               scheduleManager.deleteSchedule(widget.schedule.id);

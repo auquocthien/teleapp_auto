@@ -153,14 +153,16 @@ class EventManager extends ChangeNotifier {
       Event open = Event(
           id: '$scheduleId/event-$eventId',
           actionName: 'open reload panel',
-          actionType: 'reload',
+          actionType: 'single',
+          clickCount: 0,
           dx: reloadCoordinates.dx,
           dy: reloadCoordinates.dy,
           timeWait: const Duration(minutes: 30));
       Event click = Event(
           id: '$scheduleId/event-$eventId',
           actionName: 'click reload button',
-          actionType: 'reload',
+          actionType: 'single',
+          clickCount: 0,
           dx: reloadButton.dx,
           dy: reloadButton.dy,
           timeWait: const Duration(minutes: 30));
