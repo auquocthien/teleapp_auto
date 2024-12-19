@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_auto_tele/config/config.dart';
 import 'package:flutter_auto_tele/models/tele_app.dart';
+import 'package:flutter_auto_tele/services/app_control.dart';
+import 'package:flutter_auto_tele/services/images_control.dart';
 import 'package:flutter_auto_tele/ui/event/event_list.dart';
 import 'package:flutter_auto_tele/ui/schedule/schedule_manager.dart';
 import 'package:flutter_auto_tele/ui/schedule/schedules.dart';
@@ -21,9 +23,29 @@ class AddSchedule extends StatefulWidget {
 class _AddScheduleState extends State<AddSchedule> {
   int scheduleCount = 0;
   TeleApp? app;
+  List<String> imagePathList = [];
+  int index = 0;
+
+  ImagesControl imagesControl = ImagesControl();
+  AppControl appControl = AppControl();
+
+  Future<void> getImageListPath() async {
+    imagePathList = await imagesControl.getImageListByHwnd(app!.hwnd!);
+    if (imagePathList.isNotEmpty) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    getImageListPath();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    // getImageListPath();
     app = context.read<TeleAppManager>().getAppById(widget.appId);
     String imagePath = '$temporarySavePath/${app!.hwnd}_home.png';
 
@@ -39,33 +61,133 @@ class _AddScheduleState extends State<AddSchedule> {
         ),
         body: Container(
           padding: const EdgeInsets.all(10),
-          child: Row(
+          child: Stack(
             children: [
-              Container(
-                width: 50,
-                decoration: BoxDecoration(border: Border.all(width: 0.5)),
-                child: buildToolBar(),
+              Row(
+                children: [
+                  Container(
+                    width: 50,
+                    decoration: BoxDecoration(border: Border.all(width: 0.5)),
+                    child: buildToolBar(),
+                  ),
+                  Expanded(
+                    child: Schedules(widget.appId, app!.hwnd!),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 0.5),
+                      image: DecorationImage(
+                          image: imagePathList.isNotEmpty
+                              ? FileImage(File(imagePathList[index]))
+                              : FileImage(File(imagePath)),
+                          fit: BoxFit.cover),
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(10),
+                        bottomRight: Radius.circular(10),
+                      ),
+                    ),
+                    width: 64 * 6,
+                    height: MediaQuery.of(context).size.height,
+                    child: const EventList(),
+                  ),
+                ],
               ),
-              Expanded(
-                child: Schedules(widget.appId, app!.hwnd!),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(width: 0.5),
-                  image: DecorationImage(
-                      image: FileImage(File(imagePath)), fit: BoxFit.cover),
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(10),
-                    bottomRight: Radius.circular(10),
+              Positioned(
+                right: 65 * 6,
+                child: SizedBox(
+                  height: 185,
+                  width: 50,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      buildIconContainer(
+                        icon: Icons.camera_alt_rounded,
+                        color: Colors.blue,
+                        onPressed: () async {
+                          await appControl.captureScreenshot(app!.hwnd!);
+
+                          String newPath = await imagesControl.renameImage(
+                              imagePathList.isEmpty ? 1 : imagePathList.length,
+                              app!.hwnd!);
+                          newPath = await imagesControl.cropImage(newPath, 10,
+                              isHome: false);
+
+                          await imagesControl.deleteImage(app!.hwnd!);
+                          await getImageListPath();
+                        },
+                      ),
+                      buildIconContainer(
+                        icon: Icons.arrow_upward,
+                        color: Colors.green,
+                        onPressed: () async {
+                          await getImageListPath();
+                          setState(() {
+                            if (index > 0) {
+                              index = index - 1;
+                            }
+                          });
+                        },
+                      ),
+                      buildIconContainer(
+                        icon: Icons.arrow_downward,
+                        color: Colors.green,
+                        onPressed: () async {
+                          await getImageListPath();
+                          setState(() {
+                            if (index + 1 < imagePathList.length) {
+                              index = index + 1;
+                            }
+                          });
+                        },
+                      ),
+                      buildIconContainer(
+                          icon: Icons.delete,
+                          color: Colors.red,
+                          onPressed: () async {
+                            await imagesControl.deleteImage(
+                              imagePathList[index],
+                            );
+                            imageCache
+                                .evict(FileImage(File(imagePathList[index])));
+                            await getImageListPath();
+                            setState(() {
+                              index = 0;
+                            });
+                          })
+                    ],
                   ),
                 ),
-                width: 64 * 6,
-                height: MediaQuery.of(context).size.height,
-                child: const EventList(),
-              ),
+              )
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget buildIconContainer({
+    required IconData icon,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      height: 40,
+      width: 40,
+      decoration: BoxDecoration(
+        color: Colors.white, // Màu nền
+        shape: BoxShape.circle, // Hình dạng tròn
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5), // Màu shadow
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 2), // Độ dịch chuyển của shadow
+          ),
+        ],
+      ),
+      child: IconButton(
+        icon: Icon(icon, color: color), // Đặt icon và màu icon
+        onPressed: onPressed,
       ),
     );
   }

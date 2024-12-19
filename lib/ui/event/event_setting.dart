@@ -24,8 +24,6 @@ class _EventSettingState extends State<EventSetting> {
   final TextEditingController _minuteController = TextEditingController();
   final TextEditingController _secondController = TextEditingController();
 
-  String? selectPreNode;
-
   void initEventSetting() {
     Event event = widget.event;
     multiClick = event.actionType == 'multi';

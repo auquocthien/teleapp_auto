@@ -9,7 +9,7 @@ class EventLinePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (points.length > 1) {
       final paint = Paint()
-        ..color = Colors.white
+        ..color = Colors.blue
         ..strokeWidth = 2.5
         ..style = PaintingStyle.stroke;
 

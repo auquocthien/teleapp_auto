@@ -4,6 +4,8 @@ import 'package:flutter_auto_tele/models/event.dart';
 class EventManager extends ChangeNotifier {
   List<Event> _events = [];
   String currentScheduleId = '';
+  final Offset reloadCoordinates = const Offset(300, 28);
+  final Offset reloadButton = const Offset(300, 50);
 
   EventManager();
 
@@ -69,7 +71,6 @@ class EventManager extends ChangeNotifier {
       {String actionName = 'Default Action',
       String actionType = 'single',
       Duration timeWait = Duration.zero,
-      int? preNode,
       int? clickCount}) {
     int eventCountByScheduleId = getEventCountBySchduleId(scheduleId);
     String eventId = DateTime.now().microsecondsSinceEpoch.toString();
@@ -80,7 +81,6 @@ class EventManager extends ChangeNotifier {
         timeWait: timeWait,
         dx: (eventCountByScheduleId * 15) + 100,
         dy: (eventCountByScheduleId * 15) + 100,
-        preNode: preNode,
         clickCount: actionType == 'multi' ? clickCount : 0);
 
     scheduleId = scheduleId;
@@ -103,7 +103,6 @@ class EventManager extends ChangeNotifier {
     Duration? timeWait,
     double? dx,
     double? dy,
-    int? preNode,
     DateTime? lastActive, // Cập nhật để thay đổi lastActive
     int? clickCount,
   }) {
@@ -118,7 +117,6 @@ class EventManager extends ChangeNotifier {
         timeWait: timeWait,
         dx: dx,
         dy: dy,
-        preNode: preNode,
         lastActive: lastActive,
         clickCount: clickCount);
 
@@ -144,5 +142,39 @@ class EventManager extends ChangeNotifier {
     } else {
       print('Event cannot be triggered yet.');
     }
+  }
+
+  List<Event> getListEventReload(String scheduleId) {
+    String eventId = DateTime.now().microsecondsSinceEpoch.toString();
+
+    if (isExitsReloadEvent()) {
+      return findReloadEvent();
+    } else {
+      Event open = Event(
+          id: '$scheduleId/event-$eventId',
+          actionName: 'open reload panel',
+          actionType: 'reload',
+          dx: reloadCoordinates.dx,
+          dy: reloadCoordinates.dy,
+          timeWait: const Duration(minutes: 30));
+      Event click = Event(
+          id: '$scheduleId/event-$eventId',
+          actionName: 'click reload button',
+          actionType: 'reload',
+          dx: reloadButton.dx,
+          dy: reloadButton.dy,
+          timeWait: const Duration(minutes: 30));
+      _events.addAll([open, click]);
+      notifyListeners();
+      return [open, click];
+    }
+  }
+
+  bool isExitsReloadEvent() {
+    return _events.any((element) => element.actionType == 'reload');
+  }
+
+  List<Event> findReloadEvent() {
+    return _events.where((element) => element.actionType == 'reload').toList();
   }
 }

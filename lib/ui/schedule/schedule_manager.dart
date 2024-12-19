@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auto_tele/models/event.dart';
 import 'package:flutter_auto_tele/models/schedule.dart';
+import 'package:flutter_auto_tele/ui/event/event_manager.dart';
 
 class ScheduleManager extends ChangeNotifier {
   final List<Schedule> _schedule = [];
+  final EventManager eventManager = EventManager();
 
   ScheduleManager();
 
@@ -38,6 +40,29 @@ class ScheduleManager extends ChangeNotifier {
         scheduleName: '$appId/schdeule_$scheduleIndex',
         repeatCount: 0);
     _schedule.add(schedule);
+    notifyListeners();
+  }
+
+  Schedule addReloadSchedule(String appId) {
+    String scheduleId = '$appId/schdeule-0';
+    List<Event> reloadAction = eventManager.getListEventReload(scheduleId);
+    Event open = reloadAction[0];
+    Event click = reloadAction[1];
+
+    Schedule schedule = Schedule(
+        id: scheduleId,
+        scheduleName: 'default schedule',
+        repeatCount: 5,
+        events: [open, click]);
+    _schedule.add(schedule);
+    notifyListeners();
+    return schedule;
+  }
+
+  
+
+  void deleteSchduleByAppId(String appId) {
+    _schedule.removeWhere((element) => element.id.contains(appId));
     notifyListeners();
   }
 
@@ -136,5 +161,9 @@ class ScheduleManager extends ChangeNotifier {
       _schedule[index] = _schedule[index].copyWith(events: events);
       notifyListeners();
     }
+  }
+
+  int getScheduleCountOfApp(String appId) {
+    return _schedule.where((element) => element.id == appId).length;
   }
 }

@@ -5,7 +5,6 @@ class Event {
   final Duration timeWait;
   final double dx;
   final double dy;
-  final int? preNode;
   final DateTime? lastActive;
   final int? clickCount;
 
@@ -16,7 +15,6 @@ class Event {
       required this.timeWait,
       required this.dx,
       required this.dy,
-      this.preNode,
       this.lastActive,
       this.clickCount});
 
@@ -27,7 +25,6 @@ class Event {
       Duration? timeWait,
       double? dx,
       double? dy,
-      int? preNode,
       DateTime? lastActive,
       int? clickCount}) {
     return Event(
@@ -37,7 +34,6 @@ class Event {
         timeWait: timeWait ?? this.timeWait,
         dx: dx ?? this.dx,
         dy: dy ?? this.dy,
-        preNode: preNode ?? this.preNode,
         lastActive: lastActive ?? this.lastActive,
         clickCount: clickCount ?? this.clickCount);
   }

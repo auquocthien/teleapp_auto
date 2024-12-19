@@ -5,6 +5,7 @@ import 'package:flutter_auto_tele/models/tele_app.dart';
 import 'package:flutter_auto_tele/services/app_control.dart';
 import 'package:flutter_auto_tele/services/images_control.dart';
 import 'package:flutter_auto_tele/ui/schedule/add_schedule.dart';
+import 'package:flutter_auto_tele/ui/schedule/schedule_manager.dart';
 import 'package:flutter_auto_tele/ui/tele_app/tele_app_manager.dart';
 import 'package:provider/provider.dart';
 
@@ -22,6 +23,8 @@ class _CellItemState extends State<CellItem> {
   String? imagePath;
   bool isEditing = false;
   String titleApp = '';
+  // bool isHovered = false;
+  int? hoveredIndex;
 
   @override
   void initState() {
@@ -37,7 +40,9 @@ class _CellItemState extends State<CellItem> {
       if (!fileExists) {
         await appControl.captureScreenshot(widget.app.hwnd!);
       }
-      String croppedPath = await imagesControl.cropImage(path, 10);
+      String croppedPath =
+          await imagesControl.cropImage(path, 10, isHome: true);
+      await imagesControl.deleteImage(widget.app.hwnd!);
       setState(() {
         imagePath = croppedPath;
       });
@@ -128,8 +133,12 @@ class _CellItemState extends State<CellItem> {
                   child: Container(
                     width: 325,
                     height: 570,
-                    decoration: const BoxDecoration(boxShadow: [
-                      BoxShadow(color: Colors.grey, blurRadius: 4)
+                    decoration: BoxDecoration(boxShadow: [
+                      BoxShadow(
+                          color: imagePath != null
+                              ? Colors.grey
+                              : Colors.transparent,
+                          blurRadius: 4)
                     ]),
                   ),
                 ),
@@ -145,6 +154,7 @@ class _CellItemState extends State<CellItem> {
             ),
           ),
         ),
+        buildSchedulesList(),
         Positioned(
           top: 5,
           right: 55,
@@ -152,8 +162,12 @@ class _CellItemState extends State<CellItem> {
             heroTag: 'delete_app_${widget.app.hwnd}',
             mini: true,
             backgroundColor: Colors.red,
-            onPressed: () {
+            onPressed: () async {
               context.read<TeleAppManager>().deleteTeleAppById(widget.app.id);
+              context
+                  .read<ScheduleManager>()
+                  .deleteSchduleByAppId(widget.app.id);
+              imageCache.evict(FileImage(File(imagePath!)));
               setState(() {});
             },
             child: const Icon(
@@ -175,6 +189,7 @@ class _CellItemState extends State<CellItem> {
           buildSideToolItem('Play', () {}, Icons.play_arrow),
           buildSideToolItem('Pause', () {}, Icons.pause),
           buildSideToolItem('Add schedule', () {
+            context.read<ScheduleManager>().addReloadSchedule(widget.app.id);
             Navigator.of(context)
                 .pushNamed(AddSchedule.routeName, arguments: widget.app.id);
           }, Icons.schedule),
@@ -222,6 +237,61 @@ class _CellItemState extends State<CellItem> {
                   });
                 },
                 icon: const Icon(Icons.exit_to_app))),
+      ),
+    );
+  }
+
+  Widget buildSchedulesList() {
+    int scheduleCount = context
+        .read<ScheduleManager>()
+        .getScheduleByAppId(widget.app.id)
+        .length;
+    print(scheduleCount);
+    return Positioned(
+      bottom: 0,
+      child: Container(
+          height: 315,
+          width: 65 * 6,
+          color: Colors.transparent,
+          child: ListView.builder(
+            itemCount: scheduleCount,
+            itemBuilder: (context, index) {
+              return buildSchedulContainer(index);
+            },
+          )),
+    );
+  }
+
+  Widget buildSchedulContainer(int index) {
+    bool isHovered = hoveredIndex == index;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 3),
+      child: Align(
+        alignment: Alignment.centerLeft, // Căn sát cạnh trái
+        child: MouseRegion(
+          onEnter: (_) => setState(() => hoveredIndex = index),
+          onExit: (_) => setState(() => hoveredIndex = null),
+          child: AnimatedContainer(
+            padding: const EdgeInsets.only(bottom: 10),
+            duration: const Duration(milliseconds: 300),
+            height: 75,
+            width: isHovered ? 65 * 6 : 40, // Mở rộng về bên phải khi hover
+            decoration: BoxDecoration(
+              boxShadow: isHovered
+                  ? [
+                      const BoxShadow(
+                          color: Colors.grey, spreadRadius: 2, blurRadius: 5),
+                    ]
+                  : [],
+              border: Border.all(width: 0.5),
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(isHovered ? 10 : 20),
+                bottomRight: Radius.circular(isHovered ? 10 : 20),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

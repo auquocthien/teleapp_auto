@@ -40,7 +40,7 @@ class _CellsState extends State<Cells> {
         childAspectRatio: 0.705,
       ),
       itemBuilder: (BuildContext context, int index) {
-        return CellItem(apps[index]); // Tạo widget cho mỗi item
+        return CellItem(apps[index]);
       },
       scrollDirection: Axis.vertical,
     );

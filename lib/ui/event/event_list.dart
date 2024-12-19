@@ -168,14 +168,14 @@ class _EventListState extends State<EventList> {
             child: Container(
               margin: const EdgeInsets.only(top: 10, right: 10),
               alignment: Alignment.center,
-              width: 50, // Kích thước tổng cho ba vòng tròn lồng nhau
-              height: 50, // Kích thước tổng cho ba vòng tròn lồng nhau
+              width: 40, // Kích thước tổng cho ba vòng tròn lồng nhau
+              height: 40, // Kích thước tổng cho ba vòng tròn lồng nhau
               child: Stack(
                 alignment: Alignment.center,
                 children: [
                   Container(
-                    width: 50,
-                    height: 50,
+                    width: 40,
+                    height: 40,
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
@@ -185,20 +185,20 @@ class _EventListState extends State<EventList> {
                         color: Colors.white),
                   ),
                   Container(
-                    width: 30,
-                    height: 30,
+                    width: 20,
+                    height: 20,
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.blueAccent, // Vòng tròn nhỏ nhất có màu nền
+                      color: Colors.blueAccent,
                     ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      (index + 1).toString(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                    child: Center(
+                      child: Text(
+                        (index + 1).toString(),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -207,8 +207,8 @@ class _EventListState extends State<EventList> {
             ),
           ),
           Positioned(
-            top: 7,
-            right: 7,
+            top: 8,
+            right: 8,
             child: TextButton(
               onPressed: () {
                 String currentScheduleId = eventManager.currentScheduleId;
@@ -245,7 +245,7 @@ class _EventListState extends State<EventList> {
               child: const Icon(
                 Icons.close,
                 color: Colors.white,
-                size: 20,
+                size: 16,
               ),
             ),
           ),
