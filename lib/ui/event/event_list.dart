@@ -1,8 +1,4 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_auto_tele/config/config.dart';
 import 'package:flutter_auto_tele/models/event.dart';
 import 'package:flutter_auto_tele/ui/event/event_line_painter.dart';
 import 'package:flutter_auto_tele/ui/event/event_manager.dart';
@@ -79,7 +75,6 @@ class _EventListState extends State<EventList> {
 
   void changeShowEventSetting() {
     setState(() {
-      print('hidden');
       showEventSetting = false;
     });
   }

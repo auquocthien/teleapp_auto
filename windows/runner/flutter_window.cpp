@@ -296,6 +296,31 @@ void CaptureWindowScreenshot(HWND hwnd, const std::string &format = "bmp")
   }
 }
 
+// mouse event
+RECT GetWindowRectByHandle(HWND hwnd)
+{
+  RECT rect;
+  if (GetWindowRect(hwnd, &rect))
+  {
+    return rect;
+  }
+  return RECT{0, 0, 0, 0};
+}
+
+void PerformMouseClick(int x, int y, HWND hwnd)
+{
+  // Lấy tọa độ và kích thước của cửa sổ
+  RECT windowRect = GetWindowRectByHandle(hwnd);
+
+  // Tính toán tọa độ màn hình từ tọa độ cửa sổ
+  int screenX = windowRect.left + x;
+  int screenY = windowRect.top + y;
+
+  // Giả lập click chuột tại toạ độ màn hình
+  mouse_event(MOUSEEVENTF_LEFTDOWN, screenX, screenY, 0, 0);
+  mouse_event(MOUSEEVENTF_LEFTUP, screenX, screenY, 0, 0);
+}
+
 bool FlutterWindow::OnCreate()
 {
   if (!Win32Window::OnCreate())
@@ -367,6 +392,42 @@ bool FlutterWindow::OnCreate()
           {
             result->Error("InvalidArgument", "Expected an integer argument");
           }
+        }
+        else if (call.method_name().compare("performClick") == 0)
+        {
+          auto arguments = call.arguments();
+          if (arguments && arguments->IsMap())
+          {
+            auto map = std::get<flutter::EncodableMap>(*arguments);
+
+            auto x_it = map.find(flutter::EncodableValue("x"));
+            auto y_it = map.find(flutter::EncodableValue("y"));
+            auto hwnd_it = map.find(flutter::EncodableValue("hwnd"));
+
+            if (x_it != map.end() && y_it != map.end() && hwnd_it != map.end())
+            {
+              auto x_value = std::get_if<int>(&(x_it->second));
+              auto y_value = std::get_if<int>(&(y_it->second));
+              auto hwnd_value = std::get_if<int>(&(hwnd_it->second));
+              if (x_value && y_value && hwnd_value)
+              {
+                int x = *x_value;
+                int y = *y_value;
+                HWND hwnd = reinterpret_cast<HWND>(static_cast<intptr_t>(*hwnd_value));
+
+                PerformMouseClick(x, y, hwnd);
+                result->Success();
+              }
+            }
+          }
+          else
+          {
+            std::cerr << "Key 'x' or 'y' not found in arguments." << std::endl;
+          }
+        }
+        else
+        {
+          result->NotImplemented();
         }
 
         else

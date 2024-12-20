@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auto_tele/models/event.dart';
+import 'package:flutter_auto_tele/services/mouse_control.dart';
 import 'package:flutter_auto_tele/ui/event/event_manager.dart';
 import 'package:flutter_auto_tele/ui/schedule/schedule_manager.dart';
 import 'package:provider/provider.dart';
@@ -14,10 +15,9 @@ class EventSetting extends StatefulWidget {
 }
 
 class _EventSettingState extends State<EventSetting> {
-  List<String> startedNode = [];
-
   bool multiClick = false;
   bool singleClick = true;
+  final MouseControl mouseControl = MouseControl();
   final TextEditingController _controller = TextEditingController();
 
   final TextEditingController _hourController = TextEditingController();
@@ -120,8 +120,18 @@ class _EventSettingState extends State<EventSetting> {
                   Icons.check,
                 ),
                 buildEventSettingButton(
-                  () {
-                    print('Event execution started');
+                  () async {
+                    try {
+                      int hwnd = context.read<EventManager>().appHwnd;
+                      int dx = widget.event.dx.toInt();
+                      int dy = widget.event.dy.toInt();
+                      print('$dx $dy $hwnd');
+
+                      await mouseControl.performClick(dx, dy, hwnd);
+                      print('Event execution started');
+                    } catch (e) {
+                      print('error occucrred when click: $e');
+                    }
                   },
                   Colors.greenAccent,
                   Icons.play_arrow_rounded,

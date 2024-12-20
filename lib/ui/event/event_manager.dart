@@ -4,6 +4,7 @@ import 'package:flutter_auto_tele/models/event.dart';
 class EventManager extends ChangeNotifier {
   List<Event> _events = [];
   String currentScheduleId = '';
+  int currentAppHwnd = 0;
   final Offset reloadCoordinates = const Offset(300, 28);
   final Offset reloadButton = const Offset(300, 50);
 
@@ -19,6 +20,11 @@ class EventManager extends ChangeNotifier {
 
   set currentSchedule(String selectSchedule) {
     currentScheduleId = selectSchedule;
+    notifyListeners();
+  }
+
+  set currentHwnd(int hwnd) {
+    currentAppHwnd = hwnd;
     notifyListeners();
   }
 
@@ -39,6 +45,10 @@ class EventManager extends ChangeNotifier {
 
   String get scheduleId {
     return currentScheduleId;
+  }
+
+  int get appHwnd {
+    return currentAppHwnd;
   }
 
   Event? getEventById(String eventId) {

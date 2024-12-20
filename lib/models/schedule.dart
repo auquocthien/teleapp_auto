@@ -29,7 +29,6 @@ class Schedule {
       int? repeatCount,
       Duration? totalTimeWait,
       bool? isActive}) {
-    print(scheduleName ?? this.scheduleName);
     return Schedule(
         id: id ?? this.id,
         scheduleName: scheduleName ?? this.scheduleName,

@@ -1,5 +1,4 @@
 import 'package:flutter/services.dart';
-import 'package:flutter_auto_tele/models/schedule.dart';
 import 'package:flutter_auto_tele/models/tele_app.dart';
 
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -35,7 +34,6 @@ class AppControl {
 
   Future<String> captureScreenshot(int hwnd) async {
     try {
-      print(hwnd);
       String result = await _channel.invokeMethod('captureScreenshot', hwnd);
       return result;
     } catch (exception, stackTrace) {

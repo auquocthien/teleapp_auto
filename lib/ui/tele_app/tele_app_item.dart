@@ -4,6 +4,7 @@ import 'package:flutter_auto_tele/config/config.dart';
 import 'package:flutter_auto_tele/models/tele_app.dart';
 import 'package:flutter_auto_tele/services/app_control.dart';
 import 'package:flutter_auto_tele/services/images_control.dart';
+import 'package:flutter_auto_tele/ui/event/event_manager.dart';
 import 'package:flutter_auto_tele/ui/schedule/add_schedule.dart';
 import 'package:flutter_auto_tele/ui/schedule/schedule_manager.dart';
 import 'package:flutter_auto_tele/ui/tele_app/tele_app_manager.dart';
@@ -190,6 +191,7 @@ class _CellItemState extends State<CellItem> {
           buildSideToolItem('Pause', () {}, Icons.pause),
           buildSideToolItem('Add schedule', () {
             context.read<ScheduleManager>().addReloadSchedule(widget.app.id);
+            context.read<EventManager>().currentHwnd = widget.app.hwnd!;
             Navigator.of(context)
                 .pushNamed(AddSchedule.routeName, arguments: widget.app.id);
           }, Icons.schedule),
