@@ -7,6 +7,9 @@ class EventManager extends ChangeNotifier {
   int currentAppHwnd = 0;
   final Offset reloadCoordinates = const Offset(300, 28);
   final Offset reloadButton = const Offset(300, 50);
+  final String telebotToken = '7791763155:AAHLRzFaKZFBC5T-_PqDQqy4cvMtpIVI_40';
+  final String chatId = '6401692795';
+  final String windowSize = '402x712';
 
   EventManager();
 
@@ -188,5 +191,13 @@ class EventManager extends ChangeNotifier {
 
   List<Event> findReloadEvent() {
     return _events.where((element) => element.actionType == 'reload').toList();
+  }
+
+  List<double> calculateRealCor(double dx, double dy) {
+    // double realDx = dx + (dx * (350 / 402));
+    // double realDy = dy + (dy * (692 / 712));
+    double realDx = ((dx + 30) / 350) * 402;
+    double realDy = ((dy + 65) / 692) * 712;
+    return [realDx, realDy];
   }
 }

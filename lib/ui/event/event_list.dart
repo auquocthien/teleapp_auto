@@ -88,7 +88,7 @@ class _EventListState extends State<EventList> {
             .map((e) => Offset(e.dx, e.dy))
             .toList(); // Cập nhật positions theo events
         // startedNode = positions.asMap().keys.map((e) => e.toString()).toList();
-        Offset center = const Offset(25, 25);
+        Offset center = const Offset(20, 20);
         return Stack(
           children: [
             if (positions.length > 1)
@@ -108,8 +108,8 @@ class _EventListState extends State<EventList> {
                 top: position.dy,
                 child: Draggable(
                     feedback: Container(
-                      width: 50,
-                      height: 50,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
                           color: Colors.blueAccent.withOpacity(0.5),
                           shape: BoxShape.circle),

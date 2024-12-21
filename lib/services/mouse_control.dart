@@ -6,12 +6,13 @@ class MouseControl {
 
   Future<void> performClick(int x, int y, int hwnd) async {
     try {
-      print('$x $y $hwnd');
-      await _channel.invokeMethod('performClick', {
+      // print('$x $y $hwnd');
+      String result = await _channel.invokeMethod('performClick', {
         'x': x,
         'y': y,
         'hwnd': hwnd, // Gửi HWND từ Flutter
       });
+      print(result);
     } on PlatformException catch (e) {
       print("Error performing click: ${e.message}");
     }

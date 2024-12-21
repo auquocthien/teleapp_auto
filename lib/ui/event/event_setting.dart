@@ -122,13 +122,21 @@ class _EventSettingState extends State<EventSetting> {
                 buildEventSettingButton(
                   () async {
                     try {
-                      int hwnd = context.read<EventManager>().appHwnd;
-                      int dx = widget.event.dx.toInt();
-                      int dy = widget.event.dy.toInt();
+                      EventManager eventManager = context.read<EventManager>();
+                      int hwnd = eventManager.appHwnd;
+
+                      List<double> realCor = eventManager.calculateRealCor(
+                          widget.event.dx, widget.event.dy);
+                      int dx = realCor[0].toInt();
+                      int dy = realCor[1].toInt();
+
+                      // int dx = widget.event.dx.toInt();
+                      // int dy = widget.event.dy.toInt();
                       print('$dx $dy $hwnd');
 
+                      // print('Event execution started');
+                      Future.delayed(const Duration(seconds: 2));
                       await mouseControl.performClick(dx, dy, hwnd);
-                      print('Event execution started');
                     } catch (e) {
                       print('error occucrred when click: $e');
                     }

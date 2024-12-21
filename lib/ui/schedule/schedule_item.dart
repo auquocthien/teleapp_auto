@@ -61,11 +61,11 @@ class _ScheduleItemState extends State<ScheduleItem> {
     calculateTotalTimeWait();
     String currentScheduleId = context.watch<EventManager>().scheduleId;
     bool isSelected = (currentScheduleId == widget.schedule.id);
-    Color borderColor = isSelected ? Colors.grey : Colors.black;
+    Color borderColor = !isSelected ? Colors.grey : Colors.black;
     List<BoxShadow> boxShadow = isSelected
         ? [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
+              color: Colors.grey.withOpacity(0.6),
               blurRadius: 10,
               spreadRadius: 2,
               offset: const Offset(0, 3),
@@ -82,7 +82,7 @@ class _ScheduleItemState extends State<ScheduleItem> {
         decoration: BoxDecoration(
             border: Border.all(width: 0.5, color: borderColor),
             borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
+            color: const Color.fromARGB(255, 252, 252, 252),
             boxShadow: boxShadow),
         child: Column(
           children: [
@@ -205,7 +205,6 @@ class _ScheduleItemState extends State<ScheduleItem> {
                     type: ToastificationType.info);
                 setState(() {});
               }
-              print(widget.schedule.totalTimeWait);
             }, const Color.fromARGB(255, 255, 233, 38)),
             buildButtonFooter('Del', () {
               scheduleManager.deleteSchedule(widget.schedule.id);
@@ -220,7 +219,6 @@ class _ScheduleItemState extends State<ScheduleItem> {
             buildRepeatCount(),
             buildButtonFooter('Run', () async {
               String result = await appControl.captureScreenshot(widget.hwnd);
-              print(result);
               // throw Exception('this is test');
             }, Colors.blue),
             buildButtonFooter('Reset', () {

@@ -309,16 +309,75 @@ RECT GetWindowRectByHandle(HWND hwnd)
 
 void PerformMouseClick(int x, int y, HWND hwnd)
 {
-  // Lấy tọa độ và kích thước của cửa sổ
-  RECT windowRect = GetWindowRectByHandle(hwnd);
+  // Lấy vị trí của cửa sổ
+  RECT windowRect;
+  if (!GetWindowRect(hwnd, &windowRect))
+  {
+    std::cerr << "Failed to get window rectangle." << std::endl;
+    return;
+  }
 
-  // Tính toán tọa độ màn hình từ tọa độ cửa sổ
-  int screenX = windowRect.left + x;
-  int screenY = windowRect.top + y;
+  // Kiểm tra nếu RECT không hợp lệ
+  if (windowRect.left == windowRect.right || windowRect.top == windowRect.bottom)
+  {
+    std::cerr << "Invalid window rectangle." << std::endl;
+    return;
+  }
 
-  // Giả lập click chuột tại toạ độ màn hình
-  mouse_event(MOUSEEVENTF_LEFTDOWN, screenX, screenY, 0, 0);
-  mouse_event(MOUSEEVENTF_LEFTUP, screenX, screenY, 0, 0);
+  int width = windowRect.right - windowRect.left;  // Chiều rộng cửa sổ
+  int height = windowRect.bottom - windowRect.top; // Chiều cao cửa sổ
+
+  std::cout << "Windows position: (" << windowRect.left << ", " << windowRect.top << ")" << std::endl;
+  std::cout << "Windows size: " << width << "x" << height << std::endl; // In ra kích thước
+
+  SetForegroundWindow(hwnd);
+  SetFocus(hwnd);
+  // Chuyển đổi tọa độ từ cửa sổ sang màn hình
+  POINT clientPos = {x, y};
+  if (!ClientToScreen(hwnd, &clientPos))
+  {
+    std::cerr << "Failed to convert client coordinates to screen coordinates." << std::endl;
+    return;
+  }
+
+  // Kiểm tra giá trị của clientPos
+  std::cout << "Clicking at screen position: (" << clientPos.x << ", " << clientPos.y << ")" << std::endl;
+
+  // Tính toán tọa độ 16.16 cho SendInput
+  int screenX = clientPos.x * (65536 / GetSystemMetrics(SM_CXSCREEN));
+  int screenY = clientPos.y * (65536 / GetSystemMetrics(SM_CYSCREEN));
+
+  // Tạo input để mô phỏng nhấn và thả chuột
+  INPUT inputs[2] = {};
+
+  // Sự kiện nhấn chuột
+  inputs[0].type = INPUT_MOUSE;
+  inputs[0].mi.dx = screenX; // Tọa độ X
+  inputs[0].mi.dy = screenY; // Tọa độ Y
+  inputs[0].mi.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE | MOUSEEVENTF_LEFTDOWN;
+
+  // Sự kiện thả chuột
+  inputs[1].type = INPUT_MOUSE;
+  inputs[1].mi.dx = screenX; // Tọa độ X
+  inputs[1].mi.dy = screenY; // Tọa độ Y
+  inputs[1].mi.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE | MOUSEEVENTF_LEFTUP;
+
+  // Gửi sự kiện nhấn chuột
+  if (SendInput(1, &inputs[0], sizeof(INPUT)) == 0)
+  {
+    std::cerr << "Failed to send mouse down input." << std::endl;
+    return;
+  }
+
+  // Thêm độ trễ giữa nhấn và thả chuột (ví dụ: 100ms)
+  Sleep(100); // Đơn vị là mili giây
+
+  // Gửi sự kiện thả chuột
+  if (SendInput(1, &inputs[1], sizeof(INPUT)) == 0)
+  {
+    std::cerr << "Failed to send mouse up input." << std::endl;
+    return;
+  }
 }
 
 bool FlutterWindow::OnCreate()
@@ -395,39 +454,51 @@ bool FlutterWindow::OnCreate()
         }
         else if (call.method_name().compare("performClick") == 0)
         {
-          auto arguments = call.arguments();
-          if (arguments && arguments->IsMap())
+          try
           {
-            auto map = std::get<flutter::EncodableMap>(*arguments);
-
-            auto x_it = map.find(flutter::EncodableValue("x"));
-            auto y_it = map.find(flutter::EncodableValue("y"));
-            auto hwnd_it = map.find(flutter::EncodableValue("hwnd"));
-
-            if (x_it != map.end() && y_it != map.end() && hwnd_it != map.end())
+            auto arguments = call.arguments();
+            if (arguments && std::holds_alternative<flutter::EncodableMap>(*arguments))
             {
-              auto x_value = std::get_if<int>(&(x_it->second));
-              auto y_value = std::get_if<int>(&(y_it->second));
-              auto hwnd_value = std::get_if<int>(&(hwnd_it->second));
-              if (x_value && y_value && hwnd_value)
-              {
-                int x = *x_value;
-                int y = *y_value;
-                HWND hwnd = reinterpret_cast<HWND>(static_cast<intptr_t>(*hwnd_value));
+              auto map = std::get<flutter::EncodableMap>(*arguments);
 
-                PerformMouseClick(x, y, hwnd);
-                result->Success();
+              auto x_it = map.find(flutter::EncodableValue("x"));
+              auto y_it = map.find(flutter::EncodableValue("y"));
+              auto hwnd_it = map.find(flutter::EncodableValue("hwnd"));
+
+              if (x_it != map.end() && y_it != map.end() && hwnd_it != map.end())
+              {
+                auto x_value = std::get_if<int>(&(x_it->second));
+                auto y_value = std::get_if<int>(&(y_it->second));
+                auto hwnd_value = std::get_if<int>(&(hwnd_it->second));
+                if (x_value && y_value && hwnd_value)
+                {
+                  int x = *x_value;
+                  int y = *y_value;
+                  HWND hwnd = reinterpret_cast<HWND>(static_cast<intptr_t>(*hwnd_value));
+
+                  PerformMouseClick(x, y, hwnd);
+                  result->Success(flutter::EncodableValue("Success"));
+                }
+                else
+                {
+                  throw std::runtime_error("Invalid values for x, y, or hwnd.");
+                }
+              }
+              else
+              {
+                throw std::runtime_error("Key 'x', 'y', or 'hwnd' not found in arguments.");
               }
             }
+            else
+            {
+              throw std::runtime_error("Arguments are not a map or null.");
+            }
           }
-          else
+          catch (const std::exception &e)
           {
-            std::cerr << "Key 'x' or 'y' not found in arguments." << std::endl;
+            std::cerr << "Exception: " << e.what() << std::endl;
+            result->Error("ERROR", e.what());
           }
-        }
-        else
-        {
-          result->NotImplemented();
         }
 
         else

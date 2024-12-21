@@ -79,21 +79,20 @@ class _AddScheduleState extends State<AddSchedule> {
                       image: DecorationImage(
                           image: imagePathList.isNotEmpty
                               ? FileImage(File(imagePathList[index]))
-                              : FileImage(File(imagePath)),
-                          fit: BoxFit.cover),
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(10),
-                        bottomRight: Radius.circular(10),
-                      ),
+                              : FileImage(
+                                  File(imagePath),
+                                ),
+                          fit: BoxFit.contain,
+                          alignment: Alignment.center),
                     ),
-                    width: 64 * 6,
-                    height: MediaQuery.of(context).size.height,
+                    width: 350,
+                    height: 692,
                     child: const EventList(),
                   ),
                 ],
               ),
               Positioned(
-                right: 65 * 6,
+                right: 360,
                 child: SizedBox(
                   height: 185,
                   width: 50,
