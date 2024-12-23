@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_auto_tele/config/config.dart';
+import 'package:flutter_auto_tele/models/event.dart';
 import 'package:flutter_auto_tele/models/tele_app.dart';
 import 'package:flutter_auto_tele/services/app_control.dart';
 import 'package:flutter_auto_tele/services/images_control.dart';
 import 'package:flutter_auto_tele/ui/event/event_list.dart';
+import 'package:flutter_auto_tele/ui/event/event_manager.dart';
 import 'package:flutter_auto_tele/ui/schedule/schedule_manager.dart';
 import 'package:flutter_auto_tele/ui/schedule/schedules.dart';
 import 'package:flutter_auto_tele/ui/tele_app/tele_app_manager.dart';
@@ -36,10 +38,23 @@ class _AddScheduleState extends State<AddSchedule> {
     }
   }
 
+  void createReloadSchedule() {
+    EventManager eventManager = context.read<EventManager>();
+    ScheduleManager scheduleManager = context.read<ScheduleManager>();
+
+    if (scheduleManager.scheduleCount == 0) {
+      scheduleManager.addSchedule(widget.appId,
+          scheduleName: 'Reload Schedule');
+      String scheduleId = scheduleManager.schedules.first.id;
+      List<Event> reloadEvent = eventManager.getListEventReload(scheduleId);
+      scheduleManager.updateSchedule(scheduleId, events: reloadEvent);
+    }
+  }
+
   @override
   void initState() {
-    // TODO: implement initState
     getImageListPath();
+    createReloadSchedule();
     super.initState();
   }
 

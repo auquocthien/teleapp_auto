@@ -37,13 +37,9 @@ class EventManager extends ChangeNotifier {
 
   List<Event> getEventByScheduleId({String? scheduleId}) {
     scheduleId ??= currentScheduleId;
-    List<Event> result = [];
-    for (var element in _events) {
-      if (element.id.contains(scheduleId)) {
-        result.add(element);
-      }
-    }
-    return result;
+    return _events
+        .where((element) => element.id.contains('$scheduleId'))
+        .toList();
   }
 
   String get scheduleId {
@@ -171,6 +167,7 @@ class EventManager extends ChangeNotifier {
           dx: reloadCoordinates.dx,
           dy: reloadCoordinates.dy,
           timeWait: const Duration(minutes: 30));
+      Future.delayed(const Duration(seconds: 1));
       Event click = Event(
           id: '$scheduleId/event-$eventId',
           actionName: 'click reload button',

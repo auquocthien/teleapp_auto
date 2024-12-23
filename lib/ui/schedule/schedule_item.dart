@@ -166,7 +166,7 @@ class _ScheduleItemState extends State<ScheduleItem> {
           setState(() {
             context
                 .read<ScheduleManager>()
-                .updateScheduleName(widget.schedule.id, value);
+                .updateSchedule(widget.schedule.id, schedulName: value);
             isEditTitile = !isEditTitile;
             _titleSchedule.text = value;
           });

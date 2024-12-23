@@ -135,7 +135,6 @@ class _EventSettingState extends State<EventSetting> {
                       print('$dx $dy $hwnd');
 
                       // print('Event execution started');
-                      Future.delayed(const Duration(seconds: 2));
                       await mouseControl.performClick(dx, dy, hwnd);
                     } catch (e) {
                       print('error occucrred when click: $e');

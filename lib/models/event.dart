@@ -48,4 +48,9 @@ class Event {
     DateTime nextTriggerTime = getNextTriggerTime()!;
     return DateTime.now().isAfter(nextTriggerTime);
   }
+
+  @override
+  String toString() {
+    return 'Event(id: $id, actionName: $actionName, actionType: $actionType, timeWait: $timeWait, dx: $dx, dy: $dy)';
+  }
 }

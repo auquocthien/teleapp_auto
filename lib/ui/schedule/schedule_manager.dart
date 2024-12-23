@@ -33,38 +33,15 @@ class ScheduleManager extends ChangeNotifier {
     return [...?_schedule[index].events];
   }
 
-  void addSchedule(String appId) {
+  void addSchedule(String appId, {String? scheduleName}) {
     int scheduleIndex = scheduleCount > 0 ? scheduleCount : 0;
     Schedule schedule = Schedule(
         id: '$appId/schdeule-$scheduleIndex',
-        scheduleName: '$appId/schdeule_$scheduleIndex',
+        scheduleName: scheduleName ?? '$appId/schdeule_$scheduleIndex',
         repeatCount: 0,
         isActive: false);
     _schedule.add(schedule);
     notifyListeners();
-  }
-
-  void addReloadSchedule(String appId) {
-    String scheduleId = '$appId/schdeule-0';
-    List<Event> reloadAction = eventManager.getListEventReload(scheduleId);
-    Event open = reloadAction[0];
-    Event click = reloadAction[1];
-    Duration timeToNextRun =
-        Duration(seconds: open.timeWait.inSeconds + click.timeWait.inSeconds);
-
-    int index = schedules.indexWhere((element) => element.id.contains(appId));
-    if (index == -1) {
-      Schedule schedule = Schedule(
-          id: scheduleId,
-          scheduleName: 'Reload schedule',
-          repeatCount: 5,
-          events: [open, click],
-          totalTimeWait: timeToNextRun,
-          isActive: false);
-
-      _schedule.add(schedule);
-      notifyListeners();
-    }
   }
 
   void deleteSchduleByAppId(String appId) {
@@ -173,11 +150,23 @@ class ScheduleManager extends ChangeNotifier {
     return _schedule.where((element) => element.id == appId).length;
   }
 
-  void updateScheduleName(String scheduleId, String newName) {
+  void updateSchedule(String scheduleId,
+      {String? schedulName,
+      DateTime? startTime,
+      DateTime? interupTime,
+      List<Event>? events,
+      int? repeatCount,
+      bool? isActive}) {
     int index = _schedule.indexWhere((element) => element.id == scheduleId);
 
     if (index != -1) {
-      _schedule[index] = _schedule[index].copyWith(scheduleName: newName);
+      _schedule[index] = _schedule[index].copyWith(
+          scheduleName: schedulName,
+          startTime: startTime,
+          interupTime: interupTime,
+          events: events,
+          repeatCount: repeatCount,
+          isActive: isActive);
       notifyListeners();
       // print(schedules[index]);
     } else {
